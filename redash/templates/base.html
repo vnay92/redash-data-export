@@ -1,0 +1,39 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Export</title>
+    <!-- <link rel="stylesheet" type="text/css" href="{% static 'exports/custom.css' %}"> -->
+    <link rel="stylesheet" type="text/css" href="{% static 'exports/css/bootstrap.min.css' %}">
+
+    <script type="text/javascript" src="{% static 'exports/js/jquery-3.3.1.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'exports/js/popper.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'exports/js/bootstrap.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'exports/js/bootstrap.bundle.min.js' %}"></script>
+</head>
+<body>
+    <nav class="navbar navbar-light bg-light navbar-expand-md">
+        <span class="navbar-brand mb-0 h1">Exports Tool</span>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'alljobs' %}">Jobs</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'allexports' %}">Exports</a>
+                </li>
+            </ul>
+        </div>
+        <form class="form-inline my-2 my-lg-0">
+            <a href="/admin/logout" class="btn btn-outline-primary btn-sm" role="button">Logout</a>
+        </form>
+    </nav>
+    <div class="mb-5"></div>
+    <div id="content" class="">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container align-items-center w-50">
+    <h3>Edit Export => {{id}}</h3>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary mb-2" formaction="{% url 'saveexport' id=id %}">Reset</button>
+        <button type="submit" class="btn btn-danger mb-2" formaction="{% url 'deleteexport' id=id %}">Delete</button>
+    </form>
+</div>
+{% endblock %}

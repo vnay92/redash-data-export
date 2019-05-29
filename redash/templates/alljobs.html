@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container align-items-center w-75">
+    <div>
+        <div>
+            <h3>All Jobs Configured</h3>
+        </div>
+        <div>
+            <a href="{% url 'newjob' %}" class="btn btn-primary btn mb-2 float-left" role="button">Add New job</a>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    <table id="job_list" class="table">
+        <thead>
+            <th>Redash Query Id</th>
+            <th>Query Name</th>
+            <th>Active</th>
+            <th>Schedule (In Hours)</th>
+            <th>Is Excel Required</th>
+        </thead>
+        <tbody>
+            {% for job in jobs %}
+            <tr>
+                <td>{{job.query_id}}</td>
+                <td>{{job.query_name}}</td>
+                <td>{{job.is_active}}</td>
+                <td>{{job.schedule}}</td>
+                <td>{{job.is_excel_required}}</td>
+                <td><a href="{% url 'editjob' id=job.id %}" class="btn btn-outline-primary btn-sm"
+                        role="button">Edit</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<script type="text/javascript" src="{% static 'exports/js/alljobs.js' %}"></script>
+{% endblock %}

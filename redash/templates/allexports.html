@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container align-items-center w-75">
+    <div>
+        <div>
+            <h3>All Exports Running</h3>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    <table id="export_list" class="table">
+        <thead>
+            <th>Id</th>
+            <th>Query Name</th>
+            <th>Query Redash Export ID</th>
+            <th>Status</th>
+            <th>Initiated On (in UTC)</th>
+        </thead>
+        <tbody>
+            {% for export in exports %}
+            <tr>
+                <td>{{export.id}}</td>
+                <td>{{export.job.query_name}}</td>
+                <td>{{export.status}}</td>
+                <td>{{export.query_job_id}}</td>
+                <td>{{export.created_at}}</td>
+                <td><a href="{% url 'editexport' id=export.id %}" class="btn btn-outline-primary btn-sm"
+                        role="button">Edit</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
