@@ -5,12 +5,13 @@ import logging
 import smtplib
 
 from email import encoders
+from django.conf import settings
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 
 class GmailClient():
-    __sender = ''
-    __gmail_password = ''
+    __sender = settings.EMAIL.get('username')
+    __gmail_password = settings.EMAIL.get('password')
     __COMMASPACE = ', '
 
     def __init__(self):
@@ -21,7 +22,7 @@ class GmailClient():
         outer = MIMEMultipart()
         outer['From'] = self.__sender
         outer['To'] = self.__COMMASPACE.join(recipients)
-        outer['Subject'] = 'Data from Redash'
+        outer['Subject'] = subject
         outer.preamble = 'You will not see this in a MIME-aware mail reader.\n'
 
         # Add the attachments to the message
