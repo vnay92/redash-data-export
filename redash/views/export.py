@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 
 
 from redash.models.exports import Exports
+from redash.models.export_logs import ExportLogs
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -26,10 +27,12 @@ def all(request):
 @login_required
 def edit(request, id):
     export = Exports.objects.filter(id=id)
+    export_logs = ExportLogs.objects.filter(export_id=id)
     template = loader.get_template('editexports.html')
     viewData = {
         'id': id,
-        'export': export
+        'export': export,
+        'export_logs': export_logs
     }
     return HttpResponse(template.render(viewData, request))
 

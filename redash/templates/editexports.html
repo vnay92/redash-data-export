@@ -9,5 +9,21 @@
         <button type="submit" class="btn btn-primary mb-2" formaction="{% url 'saveexport' id=id %}">Reset</button>
         <button type="submit" class="btn btn-danger mb-2" formaction="{% url 'deleteexport' id=id %}">Delete</button>
     </form>
+    <table id="export_log_list" class="table">
+        <thead>
+            <th>Status</th>
+            <th>Time (in IST)</th>
+            <th>Errors (If any)</th>
+        </thead>
+        <tbody>
+            {% for export_log in export_logs %}
+            <tr>
+                <td>{{export_log.status}}</td>
+                <td>{{export_log.created_at}}</td>
+                <td>{{export_log.error_message}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% endblock %}

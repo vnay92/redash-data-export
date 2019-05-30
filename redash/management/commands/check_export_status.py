@@ -14,6 +14,7 @@ from redash.services.storage import StorageFacade
 from django.core.management.base import BaseCommand
 from redash.services.redash_client import RedashClient
 
+from redash.models.export_logs import ExportLogs
 
 class Command(BaseCommand):
     help = 'Schedule Export'
@@ -43,47 +44,58 @@ class Command(BaseCommand):
 
         exports = Exports.objects.filter(status=status)
         for export in exports:
-            query_execution_response = self.check_query_status_in_redash(
-                export)
-            if query_execution_response is None:
-                self.logger.info(f'Export {export.id} is still running..')
-                continue
+            try:
+                self.log_export_status(export, 'TICKED')
+                query_execution_response = self.check_query_status_in_redash(
+                    export)
+                if query_execution_response is None:
+                    self.log_export_status(export, 'STILL_RUNNING')
+                    self.logger.info(f'Export {export.id} is still running..')
+                    continue
 
-            if export.status == 'PENDING':
-                export.status = 'EXECUTED'
-                export.save()
+                if export.status == 'PENDING':
+                    self.log_export_status(export, 'EXECUTED')
+                    export.status = 'EXECUTED'
+                    export.save()
 
-            if export.status == 'EXECUTED':
-                if export.job.is_excel_required:
-                    export.file_name = self.get_export_result_as_excel(
-                        export, query_execution_response)
-                else:
-                    export.file_name = self.get_export_result_as_csv(
-                        export, query_execution_response)
+                if export.status == 'EXECUTED':
+                    if export.job.is_excel_required:
+                        export.file_name = self.get_export_result_as_excel(
+                            export, query_execution_response)
+                    else:
+                        export.file_name = self.get_export_result_as_csv(
+                            export, query_execution_response)
 
-                export.status = 'DOWNLOADED'
-                export.save()
+                    self.log_export_status(export, 'DOWNLOADED')
+                    export.status = 'DOWNLOADED'
+                    export.save()
 
-            if export.status == 'DOWNLOADED':
-                self.push_query_result_to_s3(export, query_execution_response)
-                export.status = 'SAVED_TO_STORAGE'
-                export.save()
+                if export.status == 'DOWNLOADED':
+                    self.push_query_result_to_s3(export, query_execution_response)
+                    self.log_export_status(export, 'SAVED_TO_STORAGE')
+                    export.status = 'SAVED_TO_STORAGE'
+                    export.save()
 
-            if export.status == 'SAVED_TO_STORAGE':
-                self.mail_query_result(export, query_execution_response)
-                export.status = 'MAILED'
-                export.save()
+                if export.status == 'SAVED_TO_STORAGE':
+                    self.mail_query_result(export, query_execution_response)
+                    self.log_export_status(export, 'MAILED')
+                    export.status = 'MAILED'
+                    export.save()
 
-            if export.status == 'MAILED':
-                self.push_query_result_to_sftp(export, query_execution_response)
-                export.status = 'PUSHED_TO_SFTP'
-                export.save()
+                if export.status == 'MAILED':
+                    self.push_query_result_to_sftp(export, query_execution_response)
+                    self.log_export_status(export, 'PUSHED_TO_SFTP')
+                    export.status = 'PUSHED_TO_SFTP'
+                    export.save()
+            except Exception as e:
+                self.log_export_status(export=export, status='ERROR', error=e)
+
 
     def check_query_status_in_redash(self, export):
         self.logger.info(
             f'Polling Job Id {export.query_job_id} to check for a resolution')
 
-        response = self.client.get(f'jobs/{export.query_job_id}')
+        response = self.client.get(f'jobs/{export.id}')
         self.logger.info(f'Response from the Redash Server is: {response}')
 
         if response['job']['status'] != 3:
@@ -157,3 +169,10 @@ class Command(BaseCommand):
         )
 
         self.sftp.put_file(file_name, remote_folder=export.job.sftp_path)
+
+    def log_export_status(self, export, status, error=None):
+        export_log = ExportLogs()
+        export_log.export = export
+        export_log.error_message = error
+        export_log.status = status
+        export_log.save()
