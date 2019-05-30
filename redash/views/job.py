@@ -7,6 +7,7 @@ from redash.services.scheduler import Scheduler
 from django.template import loader
 from django.http import HttpResponse
 from django.shortcuts import redirect
+from django.core.management import call_command
 from django.contrib.auth.decorators import login_required
 
 
@@ -53,8 +54,10 @@ def create(request):
     job.last_edited_by = request.user
     job.save()
 
-    Scheduler.add_job(job)
+    if data.get('is_scheduled'):
+        Scheduler.add_job(job)
 
+    call_command('schedule_export', id=job.pk)
     return redirect('alljobs')
 
 
