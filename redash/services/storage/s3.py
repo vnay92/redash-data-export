@@ -11,10 +11,6 @@ class S3Storage():
     def __init__(self):
         # Initialize the Variables
         self.logger = logging.getLogger(__name__)
-        should_create_bucket = True
-        for bucket in self.s3.buckets.all():
-            if bucket.name == self.bucket_name:
-                should_create_bucket = False
 
     def __create_bucket(self):
         return self.s3.create_bucket(

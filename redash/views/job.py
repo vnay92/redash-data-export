@@ -95,8 +95,11 @@ def save(request, id):
 
     job.save()
 
-    Scheduler.remove_job(job.id)
-    Scheduler.add_job(id=id)
+    try:
+        Scheduler.remove_job(job.id)
+        Scheduler.add_job(id=id)
+    except:
+        pass
 
     return redirect('alljobs')
 
@@ -106,4 +109,10 @@ def delete(request, id):
     job = Jobs.objects.get(id=id)
     Scheduler.remove_job(job.id)
     Jobs.objects.filter(id=id).delete()
+    try:
+        Scheduler.remove_job(job.id)
+        Scheduler.add_job(id=id)
+    except:
+        pass
+
     return redirect('alljobs')
