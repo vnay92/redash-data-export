@@ -56,8 +56,9 @@ def create(request):
 
     if data.get('is_scheduled'):
         Scheduler.add_job(job)
+        return redirect('alljobs')
 
-    call_command('schedule_export', id=job.pk)
+    call_command('schedule_export', job_id=job.pk)
     return redirect('alljobs')
 
 
