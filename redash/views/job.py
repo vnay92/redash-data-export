@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 @login_required
 def all(request):
-    jobs = Jobs.objects.all()
+    jobs = Jobs.objects.all().order_by('-created_at')
     template = loader.get_template('alljobs.html')
     viewData = {
         'jobs': jobs
@@ -80,13 +80,13 @@ def save(request, id):
     job = Jobs.objects.get(id=id)
 
     job.query_id = data.get('query_id')
-    job.is_active = (data.get('is_active') == '')
+    job.is_active = (data.get('is_active') == '' or data.get('is_active') == 'on')
     job.query_name = data.get('query_name')
     job.parameters = data.get('parameters')
     job.configured_emails = data.get('configured_emails')
     job.schedule = data.get('schedule')
-    job.is_excel_required = (data.get('is_excel_required') == '')
-    job.is_sftp_used = (data.get('is_sftp_used') == '')
+    job.is_excel_required = (data.get('is_excel_required') == '' or data.get('is_excel_required') == 'on')
+    job.is_sftp_used = (data.get('is_sftp_used') == '' or data.get('is_sftp_used') == 'on')
     job.sftp_username = data.get('sftp_username')
     job.sftp_host = data.get('sftp_host')
     job.sftp_password = data.get('sftp_password')
@@ -107,12 +107,10 @@ def save(request, id):
 @login_required
 def delete(request, id):
     job = Jobs.objects.get(id=id)
-    Scheduler.remove_job(job.id)
-    Jobs.objects.filter(id=id).delete()
     try:
         Scheduler.remove_job(job.id)
-        Scheduler.add_job(id=id)
     except:
         pass
 
+    Jobs.objects.filter(id=id).delete()
     return redirect('alljobs')

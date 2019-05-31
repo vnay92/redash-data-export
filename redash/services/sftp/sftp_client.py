@@ -34,7 +34,7 @@ class SFTPClient():
 
             # dirlist on remote host
             dirlist = sftp.listdir('.')
-            self.logger.info('Dirlist: %s' % dirlist)
+            self.logger.info(f'Dirlist: {dirlist}')
 
         except Exception as e:
             self.logger.info('*** Caught exception: %s: %s' % (e.__class__, e))
@@ -55,5 +55,13 @@ class SFTPClient():
         except IOError:
             self.logger.info(f'(assuming {remote_folder} already exists)')
 
-        sftp.put(file_path, f'{remote_folder}/{file_name}')
+        self.logger.info(f'pushing to {remote_folder} from {file_name}')
+
+        try:
+            sftp.put(file_path, f'{remote_folder}/{file_name}')
+            self.logger.info(f'Completed Pushing to {remote_folder} from {file_name}')
+        except Exception as e:
+            self.logger.error(f'Error Pushing to SFTP {e}')
+            raise e
+
         self.__client.close()

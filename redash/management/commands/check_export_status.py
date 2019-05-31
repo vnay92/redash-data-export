@@ -77,7 +77,7 @@ class Command(BaseCommand):
                     export.save()
 
                 if export.status == 'SAVED_TO_STORAGE':
-                    self.mail_query_result(export, query_execution_response)
+                    # self.mail_query_result(export, query_execution_response)
                     self.log_export_status(export, 'MAILED')
                     export.status = 'MAILED'
                     export.save()
@@ -95,8 +95,8 @@ class Command(BaseCommand):
         self.logger.info(
             f'Polling Job Id {export.query_job_id} to check for a resolution')
 
-        response = self.client.get(f'jobs/{export.id}')
-        self.logger.info(f'Response from the Redash Server is: {response}')
+        response = self.client.get(f'jobs/{export.query_job_id}')
+        # self.logger.info(f'Response from the Redash Server is: {response}')
 
         if response['job']['status'] != 3:
             return None

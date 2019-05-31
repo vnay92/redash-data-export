@@ -28,7 +28,7 @@ def all(request):
 def edit(request, id):
     export = Exports.objects.filter(id=id)
     export_logs = ExportLogs.objects.filter(export_id=id)
-    template = loader.get_template('editexports.html')
+    template = loader.get_template('editexports.html').order_by('-created_at')
     viewData = {
         'id': id,
         'export': export,
@@ -42,6 +42,10 @@ def save(request, id):
     export = Exports.objects.get(id=id)
     export.status = 'PENDING'
     export.save()
+
+    export_logs = ExportLogs.objects.filter(export_id=id)
+    export_logs.delete()
+
     return redirect('allexports')
 
 
