@@ -71,7 +71,7 @@ class Command(BaseCommand):
                     export.save()
 
                 if export.status == 'DOWNLOADED':
-                    self.push_query_result_to_s3(export, query_execution_response)
+                    # self.push_query_result_to_s3(export, query_execution_response)
                     self.log_export_status(export, 'SAVED_TO_STORAGE')
                     export.status = 'SAVED_TO_STORAGE'
                     export.save()
