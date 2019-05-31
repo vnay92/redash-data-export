@@ -103,6 +103,6 @@ def save(request, id):
 
 @login_required
 def delete(request, id):
-    Scheduler.remove_job(id)
+    # Scheduler.remove_job(id)
     Jobs.objects.filter(id=id).delete()
     return redirect('alljobs')
