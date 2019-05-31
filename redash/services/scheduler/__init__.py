@@ -1,8 +1,4 @@
 
-"""
-Demonstrates how to use the background scheduler to schedule a job that executes on 3 second
-intervals.
-"""
 import os
 import time
 import logging
@@ -23,51 +19,30 @@ class Scheduler:
     def start_schedulers():
         all_jobs = Jobs.objects.filter(is_active=True)
         for job in all_jobs:
-            Scheduler.scheduler.add_job(
-                Scheduler.schedule_job,
-                'interval',
-                id=str(job.id),
-                minutes=(job.schedule * 60),
-                args=[job]
-            )
+            Scheduler.add_job(job=job)
             logging.info(f'Added the Job {job.id} to the scheduler with an interval of {job.schedule} minutes')
 
-        Scheduler.scheduler.add_job(Scheduler.schedule_export_workers, 'interval', id='default', seconds=30)
-        Scheduler.scheduler.add_job(
-            Scheduler.schedule_export_workers,
-            'interval',
-            id='executed',
-            seconds=30,
-            args=['EXECUTED']
-        )
+        statuses_to_retry = [
+            'PENDING',
+            'MAILED',
+            'EXECUTED',
+            'DOWNLOADED',
+            'SAVED_TO_STORAGE',
+        ]
 
-        Scheduler.scheduler.add_job(
-            Scheduler.schedule_export_workers,
-            'interval',
-            id='downloaded',
-            seconds=30,
-            args=['DOWNLOADED']
-        )
+        for status_to_retry in statuses_to_retry:
+            Scheduler.scheduler.add_job(
+                Scheduler.schedule_export_workers,
+                'interval',
+                id=status_to_retry.lower(),
+                seconds=30,
+                args=[status_to_retry]
+            )
 
-        Scheduler.scheduler.add_job(
-            Scheduler.schedule_export_workers,
-            'interval',
-            id='saved_to_storage',
-            seconds=30,
-            args=['SAVED_TO_STORAGE']
-        )
+            logging.info(
+                f'Added the Worker scheduler with an interval of 30 seconds for the status: {status_to_retry}'
+            )
 
-        Scheduler.scheduler.add_job(
-            Scheduler.schedule_export_workers,
-            'interval',
-            id='mailed',
-            seconds=30,
-            args=['MAILED']
-        )
-
-        logging.info(
-            f'Added the Worker scheduler with an interval of 30 seconds'
-        )
         Scheduler.scheduler.start()
 
     @staticmethod
@@ -94,6 +69,6 @@ class Scheduler:
             Scheduler.schedule_job,
             'interval',
             id=str(job.id),
-            minutes=(job.schedule * 60),
+            seconds=(job.schedule * 60 * 60),
             args=[job]
         )

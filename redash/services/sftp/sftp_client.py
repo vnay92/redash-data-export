@@ -26,9 +26,9 @@ class SFTPClient():
                 hostkey,
                 username,
                 password,
-                gss_host=socket.getfqdn(hostname),
                 gss_auth=UseGSSAPI,
                 gss_kex=DoGSSAPIKeyExchange,
+                gss_host=socket.getfqdn(hostname),
             )
             sftp = paramiko.SFTPClient.from_transport(self.__client)
 
@@ -61,7 +61,8 @@ class SFTPClient():
             sftp.put(file_path, f'{remote_folder}/{file_name}')
             self.logger.info(f'Completed Pushing to {remote_folder} from {file_name}')
         except Exception as e:
-            self.logger.error(f'Error Pushing to SFTP {e}')
+            self.logger.info('*** In Pushing to SFTP Caught exception: %s: %s' % (e.__class__, e))
+            traceback.print_exc()
             raise e
 
         self.__client.close()

@@ -1,20 +1,24 @@
 import csv
 import json
+import zipfile
 import logging
-import datetime
 import xlsxwriter
 
 from io import StringIO
+from datetime import datetime
+
 from django.conf import settings
+from django.core.management.base import BaseCommand
+
 from redash.models.jobs import Jobs
 from redash.models.exports import Exports
+from redash.models.export_logs import ExportLogs
+
 from redash.services.sftp import SFTPFacade
 from redash.services.email import MailFacade
 from redash.services.storage import StorageFacade
-from django.core.management.base import BaseCommand
 from redash.services.redash_client import RedashClient
 
-from redash.models.export_logs import ExportLogs
 
 class Command(BaseCommand):
     help = 'Schedule Export'
@@ -25,9 +29,9 @@ class Command(BaseCommand):
             api_key=settings.REDASH.get('api_key'),
             host=settings.REDASH.get('host')
         )
-        self.storage = StorageFacade().get_instance()
         self.mail = MailFacade().get_instance()
         self.sftp = SFTPFacade().get_instance()
+        self.storage = StorageFacade().get_instance()
 
     def add_arguments(self, parser):
         parser.add_argument('-e', '--export_id', type=int,
@@ -48,6 +52,7 @@ class Command(BaseCommand):
                 self.log_export_status(export, 'TICKED')
                 query_execution_response = self.check_query_status_in_redash(
                     export)
+
                 if query_execution_response is None:
                     self.log_export_status(export, 'STILL_RUNNING')
                     self.logger.info(f'Export {export.id} is still running..')
@@ -71,32 +76,34 @@ class Command(BaseCommand):
                     export.save()
 
                 if export.status == 'DOWNLOADED':
-                    # self.push_query_result_to_s3(export, query_execution_response)
+                    self.push_query_result_to_s3(
+                        export, query_execution_response)
                     self.log_export_status(export, 'SAVED_TO_STORAGE')
                     export.status = 'SAVED_TO_STORAGE'
                     export.save()
 
                 if export.status == 'SAVED_TO_STORAGE':
-                    # self.mail_query_result(export, query_execution_response)
+                    self.mail_query_result(export, query_execution_response)
                     self.log_export_status(export, 'MAILED')
                     export.status = 'MAILED'
                     export.save()
 
                 if export.status == 'MAILED':
-                    self.push_query_result_to_sftp(export, query_execution_response)
+                    self.push_query_result_to_sftp(export)
                     self.log_export_status(export, 'PUSHED_TO_SFTP')
                     export.status = 'PUSHED_TO_SFTP'
                     export.save()
             except Exception as e:
+                self.logger.error(
+                    f'Error in Processing.. {export}, {status}, {e}')
                 self.log_export_status(export=export, status='ERROR', error=e)
-
 
     def check_query_status_in_redash(self, export):
         self.logger.info(
             f'Polling Job Id {export.query_job_id} to check for a resolution')
 
         response = self.client.get(f'jobs/{export.query_job_id}')
-        # self.logger.info(f'Response from the Redash Server is: {response}')
+        self.logger.info(f'Response from the Redash Server is: {response}')
 
         if response['job']['status'] != 3:
             return None
@@ -110,12 +117,20 @@ class Command(BaseCommand):
         response = self.client.get(url)
 
         res = response['query_result']['data']['rows']
-        file_date =  datetime.datetime.now()
-        file_name = f'results-{export.job.query_name}-{file_date}.csv'
+        file_base_name = self.get_file_base_name(export)
+        file_name = f'{file_base_name}.csv'
+
         with open(file_name, 'w') as f:
             w = csv.DictWriter(f, res[0].keys())
             w.writeheader()
             w.writerows(res)
+
+        file_name = f'{file_base_name}.zip'
+
+        with zipfile.ZipFile(file_name, 'w') as zip_file:
+            zip_file.write(f'{file_base_name}.csv',
+                           compress_type=zipfile.ZIP_DEFLATED)
+            zip_file.close()
 
         return file_name
 
@@ -125,8 +140,8 @@ class Command(BaseCommand):
         self.logger.debug(f'Making an API call to the URL {url}')
         response = self.client.get(url)
 
-        file_date =  datetime.datetime.now()
-        file_name = f'results-{export.job.query_name}-{file_date}.xlsx'
+        file_base_name = self.get_file_base_name(export)
+        file_name = f'{file_base_name}.xlsx'
         query_data = response['query_result']['data']
         book = xlsxwriter.Workbook(file_name, {
             'constant_memory': True,
@@ -147,19 +162,27 @@ class Command(BaseCommand):
                 sheet.write(r + 1, c, v)
 
         book.close()
+
+        file_name = f'{file_base_name}.zip'
+        with zipfile.ZipFile(file_name, 'w') as zip_file:
+            zip_file.write(f'{file_base_name}.xlsx',
+                           compress_type=zipfile.ZIP_DEFLATED)
+            zip_file.close()
+
         return file_name
 
     def push_query_result_to_s3(self, export, query_execution_response):
-        self.storage.save(export.file_name)
+        # self.storage.save(export.file_name)
+        pass
 
     def mail_query_result(self, export, query_execution_response):
         attachments = [
             export.file_name
         ]
-        self.mail.send_mail(recipients=export.job.configured_emails.split(
-            ';'), attachments=attachments)
+        # self.mail.send_mail(recipients=export.job.configured_emails.split(';'), attachments=attachments)
+        return attachments
 
-    def push_query_result_to_sftp(self, export, query_execution_response):
+    def push_query_result_to_sftp(self, export):
         file_name = export.file_name
         self.sftp.create_connection(
             hostname=export.job.sftp_host,
@@ -176,3 +199,6 @@ class Command(BaseCommand):
         export_log.error_message = error
         export_log.status = status
         export_log.save()
+
+    def get_file_base_name(self, export):
+        return f'{export.job.query_name}-Report-{datetime.today().strftime("%Y-%m-%d-%H-%M-%S")}'

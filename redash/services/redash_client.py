@@ -30,7 +30,6 @@ class RedashClient:
         self.logger.info(f'{url}, {method}, {params}')
         res = requests.request(method=method, url=url, params=params)
 
-        self.logger.info(res.text)
         return res.json()
 
     def get(self, url):

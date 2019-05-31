@@ -27,8 +27,8 @@ def all(request):
 @login_required
 def edit(request, id):
     export = Exports.objects.filter(id=id)
-    export_logs = ExportLogs.objects.filter(export_id=id)
-    template = loader.get_template('editexports.html').order_by('-created_at')
+    export_logs = ExportLogs.objects.filter(export_id=id).order_by('-created_at')
+    template = loader.get_template('editexports.html')
     viewData = {
         'id': id,
         'export': export,
