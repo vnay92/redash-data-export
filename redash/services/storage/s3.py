@@ -16,13 +16,6 @@ class S3Storage():
             if bucket.name == self.bucket_name:
                 should_create_bucket = False
 
-        if should_create_bucket:
-            self.logger.info(
-                f'Bucket Does Not Exist. Creating one {self.bucket_name}')
-            self.__create_bucket()
-        else:
-            self.logger.info('Bucket Exists. Skipping Bucket Creation')
-
     def __create_bucket(self):
         return self.s3.create_bucket(
             ACL='private',
