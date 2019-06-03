@@ -16,6 +16,7 @@
             <th>Query Redash Export ID</th>
             <th>Status</th>
             <th>Initiated On (in IST)</th>
+            <th>Completed On (in IST)</th>
         </thead>
         <tbody>
             {% for export in exports %}
@@ -25,6 +26,7 @@
                 <td>{{export.status}}</td>
                 <td>{{export.query_job_id}}</td>
                 <td>{{export.created_at}}</td>
+                <td>{{export.query_completed_at}}</td>
                 <td><a href="{% url 'editexport' id=export.id %}" class="btn btn-outline-primary btn-sm"
                         role="button">Edit</a></td>
                 <td><a href="{% url 'downloadexport' id=export.id %}" class="btn btn-outline-success btn-sm"

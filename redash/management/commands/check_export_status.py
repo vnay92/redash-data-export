@@ -60,6 +60,7 @@ class Command(BaseCommand):
 
                 if export.status == 'PENDING':
                     self.log_export_status(export, 'EXECUTED')
+                    export.query_completed_at = datetime.now()
                     export.status = 'EXECUTED'
                     export.save()
 
