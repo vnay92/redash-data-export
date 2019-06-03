@@ -14,5 +14,6 @@ urlpatterns = [
     path('exports/all/', export.all, name='allexports'),
     path('exports/edit/<int:id>/', export.edit, name='editexport'),
     path('exports/save/<int:id>/', export.save, name='saveexport'),
+    path('exports/download/<int:id>/', export.download, name='downloadexport'),
     path('exports/delete/<int:id>/', export.delete, name='deleteexport'),
 ]

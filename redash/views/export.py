@@ -1,9 +1,11 @@
+import os
 import json
 import logging
 
 from django.template import loader
-from django.http import HttpResponse
 from django.shortcuts import redirect
+from django.utils.encoding import smart_str
+from django.http import HttpResponse, Http404
 from django.contrib.auth.decorators import login_required
 
 
@@ -36,6 +38,21 @@ def edit(request, id):
     }
     return HttpResponse(template.render(viewData, request))
 
+
+
+@login_required
+def download(request, id):
+    export = Exports.objects.get(id=id)
+    if not os.path.exists(export.file_name):
+        raise Http404
+
+    with open(export.file_name, 'rb') as fh:
+        response = HttpResponse(
+            fh.read(), content_type="application/octetstream")
+        response['Content-Disposition'] = 'inline; filename=' + \
+            os.path.basename(export.file_name)
+
+        return response
 
 @login_required
 def save(request, id):
