@@ -18,6 +18,9 @@
             <th>Query Name</th>
             <th>Active</th>
             <th>Schedule (In Hours)</th>
+            <th>Schedule Start Time</th>
+            <th>Schedule End Time</th>
+            <th>Is Excel Required</th>
             <th>Is Excel Required</th>
         </thead>
         <tbody>
@@ -27,6 +30,8 @@
                 <td>{{job.query_name}}</td>
                 <td>{{job.is_active}}</td>
                 <td>{{job.schedule}}</td>
+                <td>{{job.schedule_start_time}}</td>
+                <td>{{job.schedule_end_time}}</td>
                 <td>{{job.is_excel_required}}</td>
                 <td><a href="{% url 'editjob' id=job.id %}" class="btn btn-outline-primary btn-sm"
                         role="button">Edit</a></td>

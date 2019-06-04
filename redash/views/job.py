@@ -4,6 +4,7 @@ import logging
 from redash.models.jobs import Jobs
 from redash.services.scheduler import Scheduler
 
+from datetime import datetime
 from django.template import loader
 from django.http import HttpResponse
 from django.shortcuts import redirect
@@ -13,7 +14,6 @@ from django.contrib.auth.decorators import login_required
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
-
 
 @login_required
 def all(request):
@@ -43,7 +43,12 @@ def create(request):
     job.query_name = data.get('query_name')
     job.parameters = data.get('parameters')
     job.configured_emails = data.get('configured_emails')
-    job.schedule = data.get('schedule')
+
+    if data.get('schedule') != '':
+        job.schedule = data.get('schedule')
+    else:
+        job.schedule = 1
+
     job.is_excel_required = (data.get('is_excel_required') == '' or data.get('is_excel_required') == 'on')
     job.is_sftp_used = (data.get('is_sftp_used') == '' or data.get('is_sftp_used') == 'on')
     job.sftp_username = data.get('sftp_username')
@@ -52,6 +57,15 @@ def create(request):
     job.sftp_path = data.get('sftp_path')
     job.added_by = request.user
     job.last_edited_by = request.user
+
+    if data.get('schedule_start_time'):
+        job.schedule_start_time = datetime.strptime(
+            data.get('schedule_start_time'), '%Y-%m-%dT%H:%M:%S')
+
+    if data.get('schedule_end_time'):
+        job.schedule_end_time = datetime.strptime(
+            data.get('schedule_end_time'), '%Y-%m-%dT%H:%M:%S')
+
     job.save()
 
     if data.get('is_scheduled'):
@@ -68,7 +82,9 @@ def edit(request, id):
     template = loader.get_template('editjob.html')
     viewData = {
         'id': id,
-        'job': job
+        'job': job,
+        'schedule_start_time': job.schedule_start_time.strftime("%Y-%m-%dT%H:%M:%S"),
+        'schedule_end_time': job.schedule_end_time.strftime("%Y-%m-%dT%H:%M:%S")
     }
     return HttpResponse(template.render(viewData, request))
 
@@ -84,14 +100,23 @@ def save(request, id):
     job.query_name = data.get('query_name')
     job.parameters = data.get('parameters')
     job.configured_emails = data.get('configured_emails')
-    job.schedule = data.get('schedule')
-    job.is_excel_required = (data.get('is_excel_required') == '' or data.get('is_excel_required') == 'on')
+
+    if data.get('schedule') != '':
+        job.schedule = data.get('schedule')
+    else:
+        job.schedule = 1
+
+    job.is_excel_required = (data.get('is_excel_required')
+                             == '' or data.get('is_excel_required') == 'on')
     job.is_sftp_used = (data.get('is_sftp_used') == '' or data.get('is_sftp_used') == 'on')
     job.sftp_username = data.get('sftp_username')
     job.sftp_host = data.get('sftp_host')
     job.sftp_password = data.get('sftp_password')
     job.sftp_path = data.get('sftp_path')
     job.last_edited_by = request.user
+
+    job.schedule_start_time = datetime.strptime(data.get('schedule_start_time'), '%Y-%m-%dT%H:%M:%S')
+    job.schedule_end_time = datetime.strptime(data.get('schedule_end_time'), '%Y-%m-%dT%H:%M:%S')
 
     job.save()
 

@@ -9,6 +9,8 @@ class Jobs(models.Model):
     parameters = models.CharField(max_length=255)
     configured_emails = models.CharField(max_length=255)
     schedule = models.IntegerField(default=4)
+    schedule_start_time = models.DateTimeField(null=True)
+    schedule_end_time = models.DateTimeField(null=True)
     is_excel_required = models.BooleanField(default=False)
     is_sftp_used = models.BooleanField(default=False)
     sftp_username = models.CharField(max_length=255, null=True)
