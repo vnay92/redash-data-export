@@ -4,6 +4,7 @@ import time
 import logging
 
 from datetime import datetime
+from django.utils import timezone
 from redash.models.jobs import Jobs
 from django.core.management import call_command
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -12,15 +13,18 @@ from apscheduler.schedulers.background import BackgroundScheduler
 logging.basicConfig()
 logging.getLogger('apscheduler').setLevel(logging.INFO)
 
+
 class Scheduler:
     scheduler = BackgroundScheduler()
 
     @staticmethod
     def start_schedulers():
-        all_jobs = Jobs.objects.filter(is_active=True)
+        all_jobs = Jobs.objects.filter(
+            is_active=True, schedule_start_time__gte=timezone.now(), schedule_end_time__gte=timezone.now())
         for job in all_jobs:
             Scheduler.add_job(job=job)
-            logging.info(f'Added the Job {job.id} to the scheduler with an interval of {job.schedule} minutes')
+            logging.info(
+                f'Added the Job {job.id} to the scheduler with an interval of {job.schedule} minutes')
 
         statuses_to_retry = [
             'PENDING',
