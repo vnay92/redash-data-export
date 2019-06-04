@@ -48,10 +48,17 @@ class Scheduler:
             )
 
         Scheduler.scheduler.add_job(
-            Scheduler.remove_stale_export_workers,
+            Scheduler.add_delayed_jobs,
             'interval',
             id='remove_schedules',
-            seconds=30
+            seconds=60
+        )
+
+        Scheduler.scheduler.add_job(
+            Scheduler.remove_stale_jobs,
+            'interval',
+            id='delayed_schedules',
+            seconds=60
         )
 
         Scheduler.scheduler.start()
@@ -65,8 +72,12 @@ class Scheduler:
         call_command('check_export_status', status=status)
 
     @staticmethod
-    def remove_stale_export_workers():
-        call_command('check_export_status')
+    def add_delayed_jobs():
+        call_command('add_delayed_schedules')
+
+    @staticmethod
+    def remove_stale_jobs():
+        call_command('remove_stale_schedules')
 
     @staticmethod
     def remove_job(id):

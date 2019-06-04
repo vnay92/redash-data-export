@@ -29,13 +29,11 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         self.logger.info('Export Status Cron Started')
         jobs = Jobs.objects.filter(
-            is_active=True, schedule_end_time__lte=timezone.now())
-
+            is_active=True, schedule_start_time__gte=timezone.now(), schedule_end_time__gte=timezone.now())
         for job in jobs:
             try:
-                Scheduler.remove_job(job.id)
-                self.logger.info(f'removed the job from schedule {job}')
+                Scheduler.add_job(job)
+                self.logger.info(f'Added the job to schedule {job}')
             except Exception as e:
                 self.logger.error(
-                    f'Error in Removing the Job.. {e}')
-
+                    f'Error in Adding the Job.. {e}')
