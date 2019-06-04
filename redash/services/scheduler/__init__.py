@@ -47,6 +47,13 @@ class Scheduler:
                 f'Added the Worker scheduler with an interval of 30 seconds for the status: {status_to_retry}'
             )
 
+        Scheduler.scheduler.add_job(
+            Scheduler.remove_stale_export_workers,
+            'interval',
+            id='remove_schedules',
+            seconds=30
+        )
+
         Scheduler.scheduler.start()
 
     @staticmethod
@@ -56,6 +63,10 @@ class Scheduler:
     @staticmethod
     def schedule_export_workers(status='PENDING'):
         call_command('check_export_status', status=status)
+
+    @staticmethod
+    def remove_stale_export_workers():
+        call_command('check_export_status')
 
     @staticmethod
     def remove_job(id):
