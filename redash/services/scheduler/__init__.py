@@ -7,6 +7,8 @@ from datetime import datetime
 from django.utils import timezone
 from redash.models.jobs import Jobs
 from django.core.management import call_command
+
+from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
 
 # Get an instance of a logger
@@ -15,7 +17,12 @@ logging.getLogger('apscheduler').setLevel(logging.INFO)
 
 
 class Scheduler:
-    scheduler = BackgroundScheduler()
+    scheduler = BackgroundScheduler({
+        # 'apscheduler.jobstores.default': {
+        #     'type': 'sqlalchemy',
+        #     'url': 'sqlite:///jobs.sqlite'
+        # },
+    })
 
     @staticmethod
     def start_schedulers():
