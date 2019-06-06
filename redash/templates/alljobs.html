@@ -21,7 +21,7 @@
             <th>Schedule Start Time</th>
             <th>Schedule End Time</th>
             <th>Is Excel Required</th>
-            <th>Is Excel Required</th>
+            <th>Should Be Zipped?</th>
         </thead>
         <tbody>
             {% for job in jobs %}
@@ -33,6 +33,7 @@
                 <td>{{job.schedule_start_time}}</td>
                 <td>{{job.schedule_end_time}}</td>
                 <td>{{job.is_excel_required}}</td>
+                <td>{{job.should_be_zipped}}</td>
                 <td><a href="{% url 'editjob' id=job.id %}" class="btn btn-outline-primary btn-sm"
                         role="button">Edit</a></td>
             </tr>

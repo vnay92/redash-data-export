@@ -58,6 +58,9 @@ def create(request):
     job.is_sftp_used = (data.get('is_sftp_used') ==
                         '' or data.get('is_sftp_used') == 'on')
 
+    job.should_be_zipped = (data.get('should_be_zipped') ==
+                            '' or data.get('should_be_zipped') == 'on')
+
     job.sftp_username = data.get('sftp_username')
     job.sftp_host = data.get('sftp_host')
     job.sftp_password = data.get('sftp_password')
@@ -123,6 +126,9 @@ def save(request, id):
                              == '' or data.get('is_excel_required') == 'on')
     job.is_sftp_used = (data.get('is_sftp_used') ==
                         '' or data.get('is_sftp_used') == 'on')
+
+    job.should_be_zipped = (data.get('should_be_zipped') ==
+                        '' or data.get('should_be_zipped') == 'on')
 
     job.sftp_username = data.get('sftp_username')
     job.sftp_host = data.get('sftp_host')

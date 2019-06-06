@@ -12,6 +12,7 @@ class Jobs(models.Model):
     schedule_start_time = models.DateTimeField(null=True)
     schedule_end_time = models.DateTimeField(null=True)
     is_excel_required = models.BooleanField(default=False)
+    should_be_zipped = models.BooleanField(default=False)
     is_sftp_used = models.BooleanField(default=False)
     sftp_username = models.CharField(max_length=255, null=True)
     sftp_host = models.CharField(max_length=255, null=True)
