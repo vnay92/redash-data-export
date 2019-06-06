@@ -47,19 +47,19 @@ class Scheduler:
                 f'Added the Worker scheduler with an interval of 30 seconds for the status: {status_to_retry}'
             )
 
-        Scheduler.scheduler.add_job(
-            Scheduler.add_delayed_jobs,
-            'interval',
-            id='remove_schedules',
-            seconds=60
-        )
+        # Scheduler.scheduler.add_job(
+        #     Scheduler.add_delayed_jobs,
+        #     'interval',
+        #     id='remove_schedules',
+        #     seconds=60
+        # )
 
-        Scheduler.scheduler.add_job(
-            Scheduler.remove_stale_jobs,
-            'interval',
-            id='delayed_schedules',
-            seconds=60
-        )
+        # Scheduler.scheduler.add_job(
+        #     Scheduler.remove_stale_jobs,
+        #     'interval',
+        #     id='delayed_schedules',
+        #     seconds=60
+        # )
 
         Scheduler.scheduler.start()
 

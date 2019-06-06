@@ -126,8 +126,10 @@ class Command(BaseCommand):
             w.writeheader()
             w.writerows(res)
 
-        file_name = f'{file_base_name}.zip'
+        if not export.job.should_be_zipped:
+            return file_name
 
+        file_name = f'{file_base_name}.zip'
         with zipfile.ZipFile(file_name, 'w') as zip_file:
             zip_file.write(f'{file_base_name}.csv',
                            compress_type=zipfile.ZIP_DEFLATED)
@@ -163,6 +165,9 @@ class Command(BaseCommand):
                 sheet.write(r + 1, c, v)
 
         book.close()
+
+        if not export.job.should_be_zipped:
+            return file_name
 
         file_name = f'{file_base_name}.zip'
         with zipfile.ZipFile(file_name, 'w') as zip_file:
