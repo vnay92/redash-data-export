@@ -67,16 +67,17 @@ def create(request):
     job.sftp_path = data.get('sftp_path')
     job.added_by = request.user
     job.last_edited_by = request.user
+    job.csv_delimiter = data.get('csv_delimiter')
 
     if data.get('schedule_start_time'):
         job.schedule_start_time = datetime.fromisoformat(
-            data.get('schedule_start_time') + ':00')
+            data.get('schedule_start_time'))
     else:
         job.schedule_start_time = datetime.now()
 
     if data.get('schedule_end_time'):
         job.schedule_end_time = datetime.fromisoformat(
-            data.get('schedule_end_time') + ':00')
+            data.get('schedule_end_time'))
     else:
         job.schedule_end_time = datetime.now()
 
@@ -131,16 +132,17 @@ def save(request, id):
                         '' or data.get('should_be_zipped') == 'on')
 
     job.sftp_username = data.get('sftp_username')
+    job.csv_delimiter = data.get('csv_delimiter')
     job.sftp_host = data.get('sftp_host')
     job.sftp_password = data.get('sftp_password')
     job.sftp_path = data.get('sftp_path')
     job.last_edited_by = request.user
 
     job.schedule_start_time = datetime.fromisoformat(
-        data.get('schedule_start_time') + ':00')
+        data.get('schedule_start_time'))
 
     job.schedule_end_time = datetime.fromisoformat(
-        data.get('schedule_end_time') + ':00')
+        data.get('schedule_end_time'))
 
     job.save()
 

@@ -122,7 +122,8 @@ class Command(BaseCommand):
         file_name = f'{file_base_name}.csv'
 
         with open(file_name, 'w') as f:
-            w = csv.DictWriter(f, res[0].keys())
+            w = csv.DictWriter(
+                f, res[0].keys(), delimiter=export.job.csv_delimiter)
             w.writeheader()
             w.writerows(res)
 

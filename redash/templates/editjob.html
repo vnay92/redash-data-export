@@ -43,6 +43,10 @@
             <input class="form-control" type="checkbox" id="is_excel_required" name="is_excel_required" value=""{% if job.is_excel_required %} checked{% endif %}>
         </div>
         <div class="form-group">
+            <label for="csv_delimiter">CSV Delimiter (Defaults to Comma [,])</label>
+            <input class="form-control" type="text" id="csv_delimiter" name="csv_delimiter" value="{{job.csv_delimiter}}">
+        </div>
+        <div class="form-group">
             <label for="should_be_zipped">Should be Zipped? (Check if yes)</label>
             <input class="form-control" type="checkbox" id="should_be_zipped" name="should_be_zipped" value=""{% if job.should_be_zipped %} checked{% endif %}>
         </div>

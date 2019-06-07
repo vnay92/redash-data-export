@@ -11,6 +11,7 @@ class Jobs(models.Model):
     schedule = models.IntegerField(default=4)
     schedule_start_time = models.DateTimeField(null=True)
     schedule_end_time = models.DateTimeField(null=True)
+    csv_delimiter = models.CharField(default=',', max_length=2)
     is_excel_required = models.BooleanField(default=False)
     should_be_zipped = models.BooleanField(default=False)
     is_sftp_used = models.BooleanField(default=False)
