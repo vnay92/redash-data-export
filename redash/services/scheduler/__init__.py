@@ -1,10 +1,7 @@
 
 import os
-import time
 import logging
 
-from datetime import datetime
-from django.utils import timezone
 from redash.models.jobs import Jobs
 from django.core.management import call_command
 
