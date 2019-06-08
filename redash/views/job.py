@@ -98,8 +98,8 @@ def edit(request, id):
     viewData = {
         'id': id,
         'job': job,
-        'schedule_start_time': job.schedule_start_time.strftime("%Y-%m-%dT%H:%M:%S"),
-        'schedule_end_time': job.schedule_end_time.strftime("%Y-%m-%dT%H:%M:%S")
+        # 'schedule_start_time': job.schedule_start_time.strftime("%Y-%m-%dT%H:%M:%S"),
+        # 'schedule_end_time': job.schedule_end_time.strftime("%Y-%m-%dT%H:%M:%S")
     }
     return HttpResponse(template.render(viewData, request))
 
