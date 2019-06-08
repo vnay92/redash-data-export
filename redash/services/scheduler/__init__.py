@@ -95,6 +95,9 @@ class Scheduler:
         if not job.is_active:
             return
 
+        if isinstance(job.schedule, str):
+            job.schedule = int(float(job.schedule))
+
         Scheduler.scheduler.add_job(
             Scheduler.schedule_job,
             'interval',
