@@ -69,17 +69,17 @@ def create(request):
     job.last_edited_by = request.user
     job.csv_delimiter = data.get('csv_delimiter')
 
-    if data.get('schedule_start_time'):
-        job.schedule_start_time = datetime.fromisoformat(
-            data.get('schedule_start_time'))
-    else:
-        job.schedule_start_time = datetime.now()
+    # if data.get('schedule_start_time'):
+    #     job.schedule_start_time = datetime.fromisoformat(
+    #         data.get('schedule_start_time'))
+    # else:
+    #     job.schedule_start_time = datetime.now()
 
-    if data.get('schedule_end_time'):
-        job.schedule_end_time = datetime.fromisoformat(
-            data.get('schedule_end_time'))
-    else:
-        job.schedule_end_time = datetime.now()
+    # if data.get('schedule_end_time'):
+    #     job.schedule_end_time = datetime.fromisoformat(
+    #         data.get('schedule_end_time'))
+    # else:
+    #     job.schedule_end_time = datetime.now()
 
     job.save()
 
