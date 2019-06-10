@@ -1,6 +1,7 @@
 import os
 import json
 import logging
+from datetime import datetime, timedelta
 
 from django.template import loader
 from django.shortcuts import redirect
@@ -20,21 +21,39 @@ logger = logging.getLogger(__name__)
 def all(request):
     exports = Exports.objects.all().order_by('-created_at')
     template = loader.get_template('allexports.html')
+    export_for_view = []
+    for export in exports:
+        export.created_at += timedelta(minutes=330)
+        if export.query_completed_at is not None:
+            export.query_completed_at += timedelta(minutes=330)
+        export_for_view.append(export)
+
     viewData = {
-        'exports': exports
+        'exports': export_for_view
     }
     return HttpResponse(template.render(viewData, request))
 
 
 @login_required
 def edit(request, id):
-    export = Exports.objects.filter(id=id)
-    export_logs = ExportLogs.objects.filter(export_id=id).order_by('-created_at')
+    export = Exports.objects.get(id=id)
+    export.created_at += timedelta(minutes=330)
+    if export.query_completed_at is not None:
+        export.query_completed_at += timedelta(minutes=330)
+
+    export_logs = ExportLogs.objects.filter(
+        export_id=id).order_by('-created_at')
+
+    export_logs_for_view = []
+    for export_log in export_logs:
+        export_log.created_at += timedelta(minutes=330)
+        export_logs_for_view.append(export_log)
+
     template = loader.get_template('editexports.html')
     viewData = {
         'id': id,
         'export': export,
-        'export_logs': export_logs
+        'export_logs': export_logs_for_view
     }
     return HttpResponse(template.render(viewData, request))
 

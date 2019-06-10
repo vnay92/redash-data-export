@@ -4,12 +4,16 @@ import logging
 from redash.models.jobs import Jobs
 from redash.services.scheduler import Scheduler
 
-from datetime import datetime
+from datetime import datetime, timedelta
+from dateutil.parser import parse
+
+from django.utils import timezone
 from django.template import loader
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.core.management import call_command
 from django.contrib.auth.decorators import login_required
+
 
 
 # Get an instance of a logger
@@ -20,8 +24,18 @@ logger = logging.getLogger(__name__)
 def all(request):
     jobs = Jobs.objects.all().order_by('-created_at')
     template = loader.get_template('alljobs.html')
+    jobs_for_view = []
+
+    for job in jobs:
+        if job.schedule_start_time is not None:
+            job.schedule_start_time += timedelta(minutes=330)
+
+        if job.schedule_end_time is not None:
+            job.schedule_end_time += timedelta(minutes=330)
+        jobs_for_view.append(job)
+
     viewData = {
-        'jobs': jobs
+        'jobs': jobs_for_view
     }
     return HttpResponse(template.render(viewData, request))
 
@@ -50,7 +64,7 @@ def create(request):
     if data.get('schedule') != '':
         job.schedule = data.get('schedule')
     else:
-        job.schedule = 1
+        job.schedule = 1 * 24 # Every day
 
     job.is_excel_required = (data.get('is_excel_required')
                              == '' or data.get('is_excel_required') == 'on')
@@ -69,17 +83,17 @@ def create(request):
     job.last_edited_by = request.user
     job.csv_delimiter = data.get('csv_delimiter')
 
-    # if data.get('schedule_start_time'):
-    #     job.schedule_start_time = datetime.fromisoformat(
-    #         data.get('schedule_start_time'))
-    # else:
-    #     job.schedule_start_time = datetime.now()
+    if data.get('schedule_start_time'):
+        job.schedule_start_time = parse(
+            data.get('schedule_start_time')) - timedelta(minutes=330)
+    else:
+        job.schedule_start_time = timezone.now()
 
-    # if data.get('schedule_end_time'):
-    #     job.schedule_end_time = datetime.fromisoformat(
-    #         data.get('schedule_end_time'))
-    # else:
-    #     job.schedule_end_time = datetime.now()
+    if data.get('schedule_end_time'):
+        job.schedule_end_time = parse(
+            data.get('schedule_end_time')) - timedelta(minutes=330)
+    else:
+        job.schedule_end_time = timezone.now()
 
     job.save()
 
@@ -95,11 +109,18 @@ def create(request):
 def edit(request, id):
     job = Jobs.objects.get(id=id)
     template = loader.get_template('editjob.html')
+
+    if job.schedule_start_time is None:
+        job.schedule_start_time = timezone.now()
+
+    if job.schedule_end_time is None:
+        job.schedule_end_time = timezone.now()
+
     viewData = {
         'id': id,
         'job': job,
-        # 'schedule_start_time': job.schedule_start_time.strftime("%Y-%m-%dT%H:%M:%S"),
-        # 'schedule_end_time': job.schedule_end_time.strftime("%Y-%m-%dT%H:%M:%S")
+        'schedule_start_time': (job.schedule_start_time + timedelta(minutes=330)).strftime("%Y-%m-%dT%H:%M:%S"),
+        'schedule_end_time': (job.schedule_end_time + timedelta(minutes=330)).strftime("%Y-%m-%dT%H:%M:%S"),
     }
     return HttpResponse(template.render(viewData, request))
 
@@ -138,11 +159,11 @@ def save(request, id):
     job.sftp_path = data.get('sftp_path')
     job.last_edited_by = request.user
 
-    # job.schedule_start_time = datetime.fromisoformat(
-    #     data.get('schedule_start_time'))
+    job.schedule_start_time = parse(
+        data.get('schedule_start_time')) - timedelta(minutes=330)
 
-    # job.schedule_end_time = datetime.fromisoformat(
-    #     data.get('schedule_end_time'))
+    job.schedule_end_time = parse(
+        data.get('schedule_end_time')) - timedelta(minutes=330)
 
     job.save()
 

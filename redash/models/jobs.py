@@ -19,10 +19,14 @@ class Jobs(models.Model):
     sftp_host = models.CharField(max_length=255, null=True)
     sftp_password = models.CharField(max_length=255, null=True)
     sftp_path = models.CharField(max_length=255, null=True)
+    is_scheduled = models.BooleanField(default=False)
+
     added_by = models.ForeignKey(
         User, null=True, blank=True, on_delete=models.SET_NULL, db_column='added_by', related_name='added_by')
+
     last_edited_by = models.ForeignKey(
         User, null=True, blank=True, on_delete=models.SET_NULL, db_column='last_edited_by', related_name='edited_by')
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

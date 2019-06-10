@@ -1,3 +1,4 @@
+import os
 import csv
 import json
 import zipfile
@@ -94,6 +95,7 @@ class Command(BaseCommand):
                     self.log_export_status(export, 'PUSHED_TO_SFTP')
                     export.status = 'PUSHED_TO_SFTP'
                     export.save()
+
             except Exception as e:
                 self.logger.error(
                     f'Error in Processing.. {export}, {status}, {e}')
@@ -135,6 +137,7 @@ class Command(BaseCommand):
             zip_file.write(f'{file_base_name}.csv',
                            compress_type=zipfile.ZIP_DEFLATED)
             zip_file.close()
+            os.remove(f'{file_base_name}.csv')
 
         return file_name
 
@@ -175,6 +178,7 @@ class Command(BaseCommand):
             zip_file.write(f'{file_base_name}.xlsx',
                            compress_type=zipfile.ZIP_DEFLATED)
             zip_file.close()
+            os.remove(f'{file_base_name}.csv')
 
         return file_name
 

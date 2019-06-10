@@ -1,7 +1,7 @@
-
 import os
 import logging
 
+from django.utils import timezone
 from redash.models.jobs import Jobs
 from django.core.management import call_command
 
@@ -24,7 +24,8 @@ class Scheduler:
     @staticmethod
     def start_schedulers():
         all_jobs = Jobs.objects.filter(
-            is_active=True)
+            is_active=True, is_scheduled=False, schedule_start_time__gt=timezone.now(), schedule_end_time__gt=timezone.now())
+
         for job in all_jobs:
             Scheduler.add_job(job=job)
             logging.info(
@@ -51,19 +52,19 @@ class Scheduler:
                 f'Added the Worker scheduler with an interval of 30 seconds for the status: {status_to_retry}'
             )
 
-        # Scheduler.scheduler.add_job(
-        #     Scheduler.add_delayed_jobs,
-        #     'interval',
-        #     id='remove_schedules',
-        #     seconds=60
-        # )
+        Scheduler.scheduler.add_job(
+            Scheduler.add_delayed_jobs,
+            'interval',
+            id='remove_schedules',
+            seconds=30
+        )
 
-        # Scheduler.scheduler.add_job(
-        #     Scheduler.remove_stale_jobs,
-        #     'interval',
-        #     id='delayed_schedules',
-        #     seconds=60
-        # )
+        Scheduler.scheduler.add_job(
+            Scheduler.remove_stale_jobs,
+            'interval',
+            id='delayed_schedules',
+            seconds=30
+        )
 
         Scheduler.scheduler.start()
 
@@ -103,5 +104,6 @@ class Scheduler:
             'interval',
             id=str(job.id),
             seconds=(job.schedule * 60 * 60),
+            name=(job.query_name + '-' + str(job.id)),
             args=[job]
         )
