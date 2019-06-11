@@ -160,12 +160,18 @@ LOGGING = {
     'handlers': {
         'django': {
             'level': 'DEBUG',
-            'class': 'logging.FileHandler',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'when': 'D',  # this specifies the interval
+            'interval': 1,  # defaults to 1, only necessary for other values
+            'backupCount': 90,
             'filename': os.path.join(BASE_DIR, 'django.log'),
         },
         'redash': {
             'level': 'DEBUG',
-            'class': 'logging.FileHandler',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'when': 'D',  # this specifies the interval
+            'interval': 1,  # defaults to 1, only necessary for other values
+            'backupCount': 90,
             'filename': os.path.join(BASE_DIR, 'redash.log'),
             'formatter': 'standard',
         },
