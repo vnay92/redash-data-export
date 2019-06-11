@@ -55,14 +55,14 @@ class Scheduler:
         Scheduler.scheduler.add_job(
             Scheduler.add_delayed_jobs,
             'interval',
-            id='remove_schedules',
+            id='delayed_schedules',
             seconds=30
         )
 
         Scheduler.scheduler.add_job(
             Scheduler.remove_stale_jobs,
             'interval',
-            id='delayed_schedules',
+            id='remove_schedules',
             seconds=30
         )
 
