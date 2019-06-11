@@ -23,7 +23,7 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         self.logger.info('Export Status Cron Started')
         jobs = Jobs.objects.filter(
-            is_active=True, schedule_start_time__gte=timezone.now(), schedule_end_time__gte=timezone.now())
+            is_active=True, schedule_start_time__lte=timezone.now(), schedule_end_time__gte=timezone.now())
         for job in jobs:
             try:
                 Scheduler.add_job(job)
