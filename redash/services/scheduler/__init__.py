@@ -24,7 +24,7 @@ class Scheduler:
     @staticmethod
     def start_schedulers():
         all_jobs = Jobs.objects.filter(
-            is_active=True, is_scheduled=False, schedule_start_time__gt=timezone.now(), schedule_end_time__gt=timezone.now())
+            is_active=True, is_scheduled=False, schedule_start_time__lt=timezone.now(), schedule_end_time__gt=timezone.now())
 
         for job in all_jobs:
             Scheduler.add_job(job=job)
