@@ -156,38 +156,7 @@ LOGGING = {
         'standard': {
             'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
         },
-    },
-    'handlers': {
-        'django': {
-            'level': 'DEBUG',
-            'class': 'logging.handlers.TimedRotatingFileHandler',
-            'when': 'D',  # this specifies the interval
-            'interval': 1,  # defaults to 1, only necessary for other values
-            'backupCount': 90,
-            'filename': os.path.join(BASE_DIR, 'django.log'),
-        },
-        'redash': {
-            'level': 'DEBUG',
-            'class': 'logging.handlers.TimedRotatingFileHandler',
-            'when': 'D',  # this specifies the interval
-            'interval': 1,  # defaults to 1, only necessary for other values
-            'backupCount': 90,
-            'filename': os.path.join(BASE_DIR, 'redash.log'),
-            'formatter': 'standard',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['django'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-        'redash': {
-            'handlers': ['redash'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-    },
+    }
 }
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

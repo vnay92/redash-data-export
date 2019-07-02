@@ -14,8 +14,6 @@ from django.shortcuts import redirect
 from django.core.management import call_command
 from django.contrib.auth.decorators import login_required
 
-
-
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
