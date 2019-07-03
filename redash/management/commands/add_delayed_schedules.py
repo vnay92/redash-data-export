@@ -23,14 +23,9 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         self.logger.info('Export Status Cron Started')
         jobs = Jobs.objects.filter(
-            is_active=True) #, schedule_start_time__lte=timezone.now(), schedule_end_time__gte=timezone.now())
+            is_active=True, schedule_start_time__lte=timezone.now(), schedule_end_time__gte=timezone.now())
 
-        now = timezone.now().time()
         for job in jobs:
-            self.logger.info(f'Time of the Cron {job.schedule_start_time.time()}')
-            if now.hour != job.schedule_start_time.time().hour or now.minute != job.schedule_start_time.time().minute:
-                continue
-
             try:
                 Scheduler.add_job(job)
                 self.logger.info(f'Added the job to schedule {job}')

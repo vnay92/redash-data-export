@@ -99,6 +99,13 @@ class Scheduler:
         if isinstance(job.schedule, str):
             job.schedule = int(float(job.schedule))
 
+        now = timezone.now().time()
+        job_time = job.schedule_start_time.time()
+        diff = abs(now.hour - job_time.hour)
+        should_skip_job = diff % job.schedule
+        if should_skip_job:
+            return
+
         Scheduler.scheduler.add_job(
             Scheduler.schedule_job,
             'interval',
