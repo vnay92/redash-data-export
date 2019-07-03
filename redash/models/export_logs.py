@@ -2,7 +2,6 @@ from . import Exports
 from django.db import models
 from django.contrib.auth.models import User
 
-
 class ExportLogs(models.Model):
     export = models.ForeignKey(Exports, on_delete=models.SET_NULL, null=True)
     status = models.CharField(max_length=255, default='PENDING')

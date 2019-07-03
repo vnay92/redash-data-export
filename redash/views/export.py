@@ -9,7 +9,6 @@ from django.utils.encoding import smart_str
 from django.http import HttpResponse, Http404
 from django.contrib.auth.decorators import login_required
 
-
 from redash.models.exports import Exports
 from redash.models.export_logs import ExportLogs
 
@@ -58,7 +57,6 @@ def edit(request, id):
     return HttpResponse(template.render(viewData, request))
 
 
-
 @login_required
 def download(request, id):
     export = Exports.objects.get(id=id)
@@ -72,6 +70,7 @@ def download(request, id):
             os.path.basename(export.file_name)
 
         return response
+
 
 @login_required
 def save(request, id):
