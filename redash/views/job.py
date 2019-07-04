@@ -2,7 +2,7 @@ import json
 import logging
 
 from redash.models.jobs import Jobs
-from redash.services.scheduler import Scheduler
+from redash.services.scheduler.Scheduler import Scheduler
 
 from datetime import datetime, timedelta
 from dateutil.parser import parse

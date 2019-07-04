@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.core.management.base import BaseCommand
 
 from redash.models.jobs import Jobs
-from redash.services.scheduler import Scheduler
+from redash.services.scheduler.Scheduler import Scheduler
 from redash.models.export_logs import ExportLogs
 
 
