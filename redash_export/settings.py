@@ -156,7 +156,26 @@ LOGGING = {
         'standard': {
             'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
         },
-    }
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'standard'
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'redash': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
 }
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

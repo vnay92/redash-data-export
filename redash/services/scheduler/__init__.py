@@ -90,6 +90,7 @@ class Scheduler:
 
     @staticmethod
     def add_job(job=None, id=None):
+        logger = logging.getLogger(__name__)
         if job == None:
             job = Jobs.objects.get(id=id)
 
@@ -103,6 +104,17 @@ class Scheduler:
         job_time = job.schedule_start_time.time()
         diff = abs(now.hour - job_time.hour)
         should_skip_job = diff % job.schedule
+
+        logger.info(f'[SCHEDULER] Values for Checking the should Skip Job', {
+            'now': now,
+            'job_time': job_time,
+            'diff': diff,
+            'should_skip_job': should_skip_job,
+        })
+
+        logger.info(
+            f'[SCHEDULER] Should Skip for the job id: {job.id}, {should_skip_job}')
+
         if should_skip_job:
             return
 
