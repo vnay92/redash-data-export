@@ -14,17 +14,18 @@ logging.getLogger('redash').setLevel(logging.INFO)
 
 
 class Scheduler:
+    url = f"mysql://{os.getenv('DATABASE_USERNAME')}:{os.getenv('DATABASE_PASSWORD')}@{os.getenv('DATABASE_HOST')}:{os.getenv('DATABASE_PORT')}/{os.getenv('DATABASE_NAME')}"
     scheduler = BackgroundScheduler({
         'apscheduler.jobstores.mysql': {
             'type': 'sqlalchemy',
-            'url': f"mysql://{os.getenv('DATABASE_USERNAME')}:{os.getenv('DATABASE_PASSWORD')}@{os.getenv('DATABASE_HOST')}:{os.getenv('DATABASE_PORT')}/{os.getenv('DATABASE_NAME')}"
+            'url': url
         },
     })
 
     @staticmethod
     def start_schedulers():
         all_jobs = Jobs.objects.filter(
-            is_active=True) #, is_scheduled=False, schedule_start_time__lt=timezone.now(), schedule_end_time__gt=timezone.now())
+            is_active=True, is_scheduled=False, schedule_start_time__lt=timezone.now(), schedule_end_time__gt=timezone.now())
 
         for job in all_jobs:
             Scheduler.add_job(job=job)
