@@ -154,7 +154,7 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'standard': {
-            'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+            'format': '[%(asctime)s] [%(name)-12s] %(levelname)-8s: %(message)s',
         },
     },
     'handlers': {
@@ -173,6 +173,11 @@ LOGGING = {
         'redash': {
             'handlers': ['console'],
             'level': 'DEBUG',
+            'propagate': True,
+        },
+        'apscheduler': {
+            'handlers': ['console'],
+            'level': 'INFO',
             'propagate': True,
         },
     },

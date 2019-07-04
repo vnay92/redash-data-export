@@ -10,7 +10,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 # Get an instance of a logger
 logging.basicConfig()
-logging.getLogger('apscheduler').setLevel(logging.INFO)
+logging.getLogger('redash').setLevel(logging.INFO)
 
 
 class Scheduler:
