@@ -2,6 +2,7 @@ jobs.sqlite
 .DS_Store
 virtual_env
 *.log
+*.log.*
 *.csv
 *.xlsx
 __pycache__
