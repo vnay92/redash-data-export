@@ -16,10 +16,10 @@ logging.getLogger('redash').setLevel(logging.INFO)
 class Scheduler:
     url = f"mysql://{os.getenv('DATABASE_USERNAME')}:{os.getenv('DATABASE_PASSWORD')}@{os.getenv('DATABASE_HOST')}:{os.getenv('DATABASE_PORT')}/{os.getenv('DATABASE_NAME')}"
     scheduler = BackgroundScheduler({
-        'apscheduler.jobstores.mysql': {
-            'type': 'sqlalchemy',
-            'url': url
-        },
+        # 'apscheduler.jobstores.mysql': {
+        #     'type': 'sqlalchemy',
+        #     'url': url
+        # },
     })
 
     @staticmethod
@@ -31,12 +31,9 @@ class Scheduler:
 
         existing_job = None
         for job in all_jobs:
-            try:
-                Scheduler.add_job(job=job)
-                logging.info(
-                    f'Added the Job {job.id} to the scheduler with an interval of {job.schedule} minutes')
-            except:
-                continue
+            Scheduler.add_job(job=job)
+            logging.info(
+                f'Added the Job {job.id} to the scheduler with an interval of {job.schedule} minutes')
 
         statuses_to_retry = [
             'MAILED',
