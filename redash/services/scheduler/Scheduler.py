@@ -34,8 +34,8 @@ class Scheduler:
                 f'Added the Job {job.id} to the scheduler with an interval of {job.schedule} minutes')
 
         statuses_to_retry = [
-            'PENDING',
             'MAILED',
+            'PENDING',
             'EXECUTED',
             'DOWNLOADED',
             'SAVED_TO_STORAGE',
@@ -110,10 +110,11 @@ class Scheduler:
         diff = abs(now.hour - job_time.hour)
         should_skip_job = diff % job.schedule
 
-        logger.info(f'[SCHEDULER] Values for Checking the should Skip Job', {
+        logger.info(f'[SCHEDULER] Values for Checking the should Skip Job')
+        logger.info({
             'now': now,
-            'job_time': job_time,
             'diff': diff,
+            'job_time': job_time,
             'should_skip_job': should_skip_job,
         })
 
@@ -122,6 +123,10 @@ class Scheduler:
 
         if should_skip_job:
             return
+
+        # Making sure the first instance is run.
+        if job.schedule == 24:
+            call_command('schedule_export', job_id=job.id)
 
         Scheduler.scheduler.add_job(
             Scheduler.schedule_job,
