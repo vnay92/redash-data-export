@@ -94,7 +94,7 @@ class Scheduler:
         Scheduler.scheduler.remove_job(str(id), jobstore=job_store)
 
     @staticmethod
-    def add_job(job=None, id=None, job_store='mysql'):
+    def add_job(job=None, id=None, job_store='default'):
         logger = logging.getLogger(__name__)
         if job == None:
             job = Jobs.objects.get(id=id)
