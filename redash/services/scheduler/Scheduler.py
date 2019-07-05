@@ -24,6 +24,8 @@ class Scheduler:
 
     @staticmethod
     def start_schedulers():
+        # Make sure that the values persisted are all loaded first
+        Scheduler.scheduler.start()
         all_jobs = Jobs.objects.filter(
             is_active=True, is_scheduled=False, schedule_start_time__lt=timezone.now(), schedule_end_time__gt=timezone.now())
 
@@ -74,8 +76,6 @@ class Scheduler:
             seconds=30,
             jobstore='default'
         )
-
-        Scheduler.scheduler.start()
 
     @staticmethod
     def schedule_job(job):
