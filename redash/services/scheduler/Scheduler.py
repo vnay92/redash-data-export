@@ -31,16 +31,12 @@ class Scheduler:
 
         existing_job = None
         for job in all_jobs:
-            existing_job = Scheduler.scheduler.get_job(job_id=job.id)
-            if existing_job:
-                continue
-
             try:
                 Scheduler.add_job(job=job)
                 logging.info(
                     f'Added the Job {job.id} to the scheduler with an interval of {job.schedule} minutes')
             except:
-                pass
+                continue
 
         statuses_to_retry = [
             'MAILED',
