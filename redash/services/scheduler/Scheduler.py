@@ -27,9 +27,13 @@ class Scheduler:
         all_jobs = Jobs.objects.filter(
             is_active=True, is_scheduled=False, schedule_start_time__lt=timezone.now(), schedule_end_time__gt=timezone.now())
 
+        existing_job = None
         for job in all_jobs:
-            Scheduler.add_job(job=job)
+            existing_job = Scheduler.scheduler.get_job(job_id=job.id)
+            if existing_job:
+                continue
 
+            Scheduler.add_job(job=job)
             logging.info(
                 f'Added the Job {job.id} to the scheduler with an interval of {job.schedule} minutes')
 
