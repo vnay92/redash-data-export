@@ -125,15 +125,16 @@ class Scheduler:
             return
 
         # Making sure the first instance is run.
-        if job.schedule == 24:
-            call_command('schedule_export', job_id=job.id)
+        try:
+            Scheduler.scheduler.add_job(
+                Scheduler.schedule_job,
+                'interval',
+                id=str(job.id),
+                seconds=(job.schedule * 60 * 60),
+                name=(job.query_name + '-' + str(job.id)),
+                args=[job],
+                jobstore=job_store
+            )
+        except:
+            pass
 
-        Scheduler.scheduler.add_job(
-            Scheduler.schedule_job,
-            'interval',
-            id=str(job.id),
-            seconds=(job.schedule * 60 * 60),
-            name=(job.query_name + '-' + str(job.id)),
-            args=[job],
-            jobstore=job_store
-        )
