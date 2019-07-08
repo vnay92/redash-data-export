@@ -5,8 +5,11 @@ import logging
 
 class S3Storage():
 
-    s3 = boto3.resource('s3')
-    bucket_name = 'swx.tiger.uploads.test'
+    session = boto3.Session(aws_access_key_id=os.getenv('AWS_SERVER_PUBLIC_KEY'),
+                            aws_secret_access_key=os.getenv('AWS_SERVER_SECRET_KEY'))
+
+    s3 = session.resource('s3')
+    bucket_name = os.getenv('S3_BUCKET_NAME')
 
     def __init__(self):
         # Initialize the Variables
@@ -17,7 +20,7 @@ class S3Storage():
             ACL='private',
             Bucket=self.bucket_name,
             CreateBucketConfiguration={
-                'LocationConstraint': 'us-west-2'
+                'LocationConstraint': os.getenv('S3_LOCATION')
             },
         )
 

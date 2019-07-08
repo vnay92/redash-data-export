@@ -12,24 +12,22 @@ from apscheduler.schedulers.background import BackgroundScheduler
 logging.basicConfig()
 logging.getLogger('redash').setLevel(logging.INFO)
 
-
 class Scheduler:
-    url = f"mysql://{os.getenv('DATABASE_USERNAME')}:{os.getenv('DATABASE_PASSWORD')}@{os.getenv('DATABASE_HOST')}:{os.getenv('DATABASE_PORT')}/{os.getenv('DATABASE_NAME')}"
-    scheduler = BackgroundScheduler({
-        # 'apscheduler.jobstores.mysql': {
-        #     'type': 'sqlalchemy',
-        #     'url': url
-        # },
-    })
+
+    """
+        This is an in-memory Store to check if a job is scheduled or not.
+        This is important as we use the in-memory store of the apScheduler.
+    """
+    initial_schedule_run = {}
+    scheduler = BackgroundScheduler()
 
     @staticmethod
     def start_schedulers():
-        # Make sure that the values persisted are all loaded first
-        Scheduler.scheduler.start()
         all_jobs = Jobs.objects.filter(
             is_active=True, is_scheduled=False, schedule_start_time__lt=timezone.now(), schedule_end_time__gt=timezone.now())
 
-        existing_job = None
+        Scheduler.scheduler.start()
+
         for job in all_jobs:
             Scheduler.add_job(job=job)
             logging.info(
@@ -124,17 +122,27 @@ class Scheduler:
         if should_skip_job:
             return
 
+        logger.info(Scheduler.initial_schedule_run)
+        if Scheduler.initial_schedule_run.get(str(job.id)):
+            logger.info(
+                f'[SCHEDULER] job id: {job.id} has already been scheduled. Returning')
+            return
+
         # Making sure the first instance is run.
-        try:
-            Scheduler.scheduler.add_job(
-                Scheduler.schedule_job,
-                'interval',
-                id=str(job.id),
-                seconds=(job.schedule * 60 * 60),
-                name=(job.query_name + '-' + str(job.id)),
-                args=[job],
-                jobstore=job_store
-            )
-        except:
-            pass
+        # So, if the app starts at 13:10 and the schedule should run at 14:00 every day,
+        # This will make sure that the 14:00 of current day is also taken into account
+        logger.info(
+            f'[SCHEDULER] job id: {job.id} is not run for the first instance, running it')
+        Scheduler.schedule_job(job=job)
+        Scheduler.initial_schedule_run[str(job.id)] = True
+
+        Scheduler.scheduler.add_job(
+            Scheduler.schedule_job,
+            'interval',
+            id=str(job.id),
+            seconds=(job.schedule * 60 * 60),
+            name=(job.query_name + '-' + str(job.id)),
+            args=[job],
+            jobstore=job_store
+        )
 

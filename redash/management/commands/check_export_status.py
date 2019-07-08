@@ -83,6 +83,7 @@ class Command(BaseCommand):
                     self.log_export_status(export, 'SAVED_TO_STORAGE')
                     export.status = 'SAVED_TO_STORAGE'
                     export.save()
+                    os.remove(export.file_name)
 
                 if export.status == 'SAVED_TO_STORAGE':
                     self.mail_query_result(export, query_execution_response)
@@ -183,8 +184,7 @@ class Command(BaseCommand):
         return file_name
 
     def push_query_result_to_s3(self, export, query_execution_response):
-        # self.storage.save(export.file_name)
-        pass
+        self.storage.save(export.file_name)
 
     def mail_query_result(self, export, query_execution_response):
         attachments = [
