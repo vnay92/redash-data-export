@@ -83,8 +83,6 @@ class Command(BaseCommand):
                     self.log_export_status(export, 'SAVED_TO_STORAGE')
                     export.status = 'SAVED_TO_STORAGE'
                     export.save()
-                    # Clean up the local file system
-                    os.remove(export.file_name)
 
                 if export.status == 'SAVED_TO_STORAGE':
                     self.mail_query_result(export, query_execution_response)
@@ -97,6 +95,8 @@ class Command(BaseCommand):
                     self.log_export_status(export, 'PUSHED_TO_SFTP')
                     export.status = 'PUSHED_TO_SFTP'
                     export.save()
+                    # Clean up the local file system
+                    os.remove(export.file_name)
 
             except Exception as e:
                 self.logger.error(
