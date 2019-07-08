@@ -83,6 +83,7 @@ class Command(BaseCommand):
                     self.log_export_status(export, 'SAVED_TO_STORAGE')
                     export.status = 'SAVED_TO_STORAGE'
                     export.save()
+                    # Clean up the local file system
                     os.remove(export.file_name)
 
                 if export.status == 'SAVED_TO_STORAGE':
