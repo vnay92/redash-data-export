@@ -154,10 +154,28 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'standard': {
-            'format': '[%(asctime)s] [%(name)-12s] %(levelname)-8s: %(message)s',
+            'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
         },
     },
     'handlers': {
+        'django': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'when': 'D',  # this specifies the interval
+            'interval': 1,  # defaults to 1, only necessary for other values
+            'backupCount': 90,
+            'filename': os.path.join(BASE_DIR, 'django.log'),
+            'formatter': 'standard'
+        },
+        'redash': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'when': 'D',  # this specifies the interval
+            'interval': 1,  # defaults to 1, only necessary for other values
+            'backupCount': 90,
+            'filename': os.path.join(BASE_DIR, 'redash.log'),
+            'formatter': 'standard',
+        },
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
@@ -166,21 +184,15 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers': ['console'],
+            'handlers': ['django', 'console'],
             'level': 'DEBUG',
             'propagate': True,
         },
         'redash': {
-            'handlers': ['console'],
+            'handlers': ['redash', 'console'],
             'level': 'DEBUG',
-            'propagate': True,
-        },
-        'apscheduler': {
-            'handlers': ['console'],
-            'level': 'INFO',
             'propagate': True,
         },
     },
 }
-
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
