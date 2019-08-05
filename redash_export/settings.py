@@ -47,7 +47,7 @@ INSTALLED_APPS = [
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 MIDDLEWARE = [
@@ -163,7 +163,7 @@ LOGGING = {
             'class': 'logging.handlers.TimedRotatingFileHandler',
             'when': 'D',  # this specifies the interval
             'interval': 1,  # defaults to 1, only necessary for other values
-            'backupCount': 90,
+            'backupCount': 3,
             'filename': os.path.join(BASE_DIR, 'django.log'),
             'formatter': 'standard'
         },
@@ -172,7 +172,7 @@ LOGGING = {
             'class': 'logging.handlers.TimedRotatingFileHandler',
             'when': 'D',  # this specifies the interval
             'interval': 1,  # defaults to 1, only necessary for other values
-            'backupCount': 90,
+            'backupCount': 3,
             'filename': os.path.join(BASE_DIR, 'redash.log'),
             'formatter': 'standard',
         },
@@ -195,4 +195,5 @@ LOGGING = {
         },
     },
 }
+
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
