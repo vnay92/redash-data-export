@@ -25,14 +25,18 @@ class Scheduler:
     @staticmethod
     def start_schedulers():
         all_jobs = Jobs.objects.filter(
-            is_active=True, is_scheduled=False, schedule_start_time__lt=timezone.now(), schedule_end_time__gt=timezone.now())
+            is_active=True, is_scheduled=False,
+            schedule_start_time__lt=timezone.now(),
+            schedule_end_time__gt=timezone.now()
+        )
 
         Scheduler.scheduler.start()
 
         for job in all_jobs:
             Scheduler.add_job(job=job)
             logging.info(
-                f'Added the Job {job.id} to the scheduler with an interval of {job.schedule} minutes')
+                f'Added the Job {job.id} to the scheduler with an interval of {job.schedule} minutes'
+            )
 
         statuses_to_retry = [
             'MAILED',
@@ -97,12 +101,20 @@ class Scheduler:
     def remove_job(id, job_store='mysql'):
         if not Scheduler.initial_schedule_run.get(str(id)):
             Scheduler.logger.info(
-                f'[SCHEDULER] job id: {id} has already been Removed. Returning')
+                f'[SCHEDULER] job id: {id} has already been Removed. Returning'
+            )
             return
+
         Scheduler.scheduler.remove_job(str(id), jobstore=job_store)
 
     @staticmethod
     def add_job(job=None, id=None, job_store='default'):
+
+        jobs_in_schedule = Scheduler.scheduler.get_jobs()
+        Scheduler.logger.info(
+            f'All jobs in the schedule right now: {jobs_in_schedule}'
+        )
+
         if job == None:
             job = Jobs.objects.get(id=id)
 
@@ -126,7 +138,8 @@ class Scheduler:
         })
 
         Scheduler.logger.info(
-            f'[SCHEDULER] Should Skip for the job id: {job.id}, {should_skip_job}')
+            f'[SCHEDULER] Should Skip for the job id: {job.id}, {should_skip_job}'
+        )
 
         if should_skip_job:
             return
@@ -134,14 +147,18 @@ class Scheduler:
         Scheduler.logger.info(Scheduler.initial_schedule_run)
         if Scheduler.initial_schedule_run.get(str(job.id)):
             Scheduler.logger.info(
-                f'[SCHEDULER] job id: {job.id} has already been scheduled. Returning')
+                f'[SCHEDULER] job id: {job.id} has already been scheduled. Returning'
+            )
+
             return
 
         # Making sure the first instance is run.
         # So, if the app starts at 13:10 and the schedule should run at 14:00 every day,
         # This will make sure that the 14:00 of current day is also taken into account
         Scheduler.logger.info(
-            f'[SCHEDULER] job id: {job.id} is not run for the first instance, running it')
+            f'[SCHEDULER] job id: {job.id} is not run for the first instance, running it'
+        )
+
         Scheduler.schedule_job(job=job)
         Scheduler.initial_schedule_run[str(job.id)] = True
 

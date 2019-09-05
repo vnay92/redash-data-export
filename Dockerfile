@@ -13,9 +13,11 @@ RUN apk add --no-cache mariadb-connector-c-dev libffi-dev openssl-dev python-dev
     apk del .build-deps;\
     pip install -r requirements.txt;
 
-EXPOSE 8002
+EXPOSE 8000
 
 COPY . .
+
+COPY ./.env.docker ./.env
 
 # Finally, once we have set up everything, we can run it
 CMD [ "python", "./manage.py", "runserver", "0.0.0.0:8000", "--noreload"]
