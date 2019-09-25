@@ -109,8 +109,14 @@ class Command(BaseCommand):
                 self.log_export_status(export=export, status='ERROR', error=e)
 
     def get_response_as_per_columns_defined(self, export, query_execution_response):
+        to_return = []
+        obj = None
         list_of_columns = export.job.columns_order.split('|')
-        return [(k, query_execution_response[k]) for k in list_of_columns if k in query_execution_response]
+        for d in query_execution_response:
+            obj = [(k, d[k]) for k in list_of_columns if k in d]
+            to_return.append(obj)
+
+        return to_return
 
 
     def check_query_status_in_redash(self, export):
