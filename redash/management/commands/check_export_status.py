@@ -20,7 +20,6 @@ from redash.services.email import MailFacade
 from redash.services.storage import StorageFacade
 from redash.services.redash_client import RedashClient
 
-
 class Command(BaseCommand):
     help = 'Schedule Export'
 
@@ -66,11 +65,6 @@ class Command(BaseCommand):
                     export.save()
 
                 if export.status == 'EXECUTED':
-                    if export.job.columns_order is None or export.job.columns_order == 'None':
-                        query_execution_response = self.get_response_as_per_columns_defined(
-                            export, query_execution_response
-                        )
-
                     if export.job.is_excel_required:
                         export.file_name = self.get_export_result_as_excel(
                             export, query_execution_response)
@@ -108,16 +102,15 @@ class Command(BaseCommand):
                     f'Error in Processing.. {export}, {status}, {e}')
                 self.log_export_status(export=export, status='ERROR', error=e)
 
-    def get_response_as_per_columns_defined(self, export, query_execution_response):
+    def get_response_as_per_columns_defined(self, export, result):
         to_return = []
         obj = None
         list_of_columns = export.job.columns_order.split('|')
-        for d in query_execution_response:
+        for d in result:
             obj = [(k, d[k]) for k in list_of_columns if k in d]
             to_return.append(obj)
 
         return to_return
-
 
     def check_query_status_in_redash(self, export):
         self.logger.info(
@@ -138,6 +131,9 @@ class Command(BaseCommand):
         response = self.client.get(url)
 
         res = response['query_result']['data']['rows']
+        if export.job.columns_order is None or export.job.columns_order == 'None':
+            res = self.get_response_as_per_columns_defined(export, res)
+
         file_base_name = self.get_file_base_name(export)
         file_name = f'{file_base_name}.csv'
 
