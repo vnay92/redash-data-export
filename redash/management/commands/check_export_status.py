@@ -66,6 +66,11 @@ class Command(BaseCommand):
                     export.save()
 
                 if export.status == 'EXECUTED':
+                    if export.job.columns_order is None or export.job.columns_order == 'None':
+                        query_execution_response = self.get_response_as_per_columns_defined(
+                            export, query_execution_response
+                        )
+
                     if export.job.is_excel_required:
                         export.file_name = self.get_export_result_as_excel(
                             export, query_execution_response)
@@ -102,6 +107,11 @@ class Command(BaseCommand):
                 self.logger.error(
                     f'Error in Processing.. {export}, {status}, {e}')
                 self.log_export_status(export=export, status='ERROR', error=e)
+
+    def get_response_as_per_columns_defined(self, export, query_execution_response):
+        list_of_columns = export.job.columns_order.split('|')
+        return [(k, query_execution_response[k]) for k in list_of_columns if k in query_execution_response]
+
 
     def check_query_status_in_redash(self, export):
         self.logger.info(
