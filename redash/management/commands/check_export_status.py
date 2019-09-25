@@ -120,8 +120,6 @@ class Command(BaseCommand):
         url = f'queries/{export.job.query_id}/results/{result_id}.json'
         self.logger.debug(f'Making an API call to the URL {url}')
         response = self.client.get(url)
-        self.logger.debug(
-            f'API Response From Redash to post as CSV {response}')
 
         res = response['query_result']['data']['rows']
         file_base_name = self.get_file_base_name(export)

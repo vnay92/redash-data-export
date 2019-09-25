@@ -19,6 +19,7 @@ class Jobs(models.Model):
     sftp_host = models.CharField(max_length=255, null=True)
     sftp_password = models.CharField(max_length=255, null=True)
     sftp_path = models.CharField(max_length=255, null=True)
+    columns_order = models.CharField(max_length=500, null=True)
     is_scheduled = models.BooleanField(default=False)
 
     added_by = models.ForeignKey(

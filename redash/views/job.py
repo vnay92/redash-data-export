@@ -81,6 +81,8 @@ def create(request):
     job.last_edited_by = request.user
     job.csv_delimiter = data.get('csv_delimiter')
 
+    job.columns_order = data.get('columns_order')
+
     if data.get('schedule_start_time'):
         job.schedule_start_time = parse(
             data.get('schedule_start_time')) - timedelta(minutes=330)
@@ -156,6 +158,8 @@ def save(request, id):
     job.sftp_password = data.get('sftp_password')
     job.sftp_path = data.get('sftp_path')
     job.last_edited_by = request.user
+
+    job.columns_order = data.get('columns_order')
 
     job.schedule_start_time = parse(
         data.get('schedule_start_time')) - timedelta(minutes=330)
