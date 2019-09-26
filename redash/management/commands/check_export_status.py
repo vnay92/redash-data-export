@@ -131,13 +131,16 @@ class Command(BaseCommand):
         response = self.client.get(url)
 
         res = response['query_result']['data']['rows']
-        if export.job.columns_order is None or export.job.columns_order == 'None':
+        if export.job.columns_order is not None or export.job.columns_order != 'None':
             res = self.get_response_as_per_columns_defined(export, res)
 
         file_base_name = self.get_file_base_name(export)
         file_name = f'{file_base_name}.csv'
 
         with open(file_name, 'w') as f:
+            if export.job.csv_delimiter is None or export.job.csv_delimiter == 'None':
+                export.job.csv_delimiter = ','
+
             w = csv.DictWriter(
                 f, res[0].keys(), delimiter=export.job.csv_delimiter)
             w.writeheader()
