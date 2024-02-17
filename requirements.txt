@@ -18,7 +18,7 @@ jmespath==0.9.4
 lazy-object-proxy==1.4.1
 mccabe==0.6.1
 mysqlclient==1.4.2.post1
-paramiko==2.10.1
+paramiko==3.4.0
 pyasn1==0.4.5
 pycodestyle==2.5.0
 pycparser==2.19
